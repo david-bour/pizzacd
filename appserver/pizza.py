@@ -13,7 +13,7 @@ def init_db():
 @app.cli.command('create-user')
 @click.argument('name')
 def create_user(name):
-    user = Account(name)
+    user = Account(username=name)
     db.session.add(user)
     db.session.commit()
 
