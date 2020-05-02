@@ -6,10 +6,6 @@ from app.models import Account
 app_config = os.environ['FLASK_APP_CONFIG']
 app = create_app(config=f'config.{app_config}')
 
-@app.cli.command('init-db')
-def init_db():
-    db.create_all()
-
 @app.cli.command('create-user')
 @click.argument('name')
 def create_user(name):

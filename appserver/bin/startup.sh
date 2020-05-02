@@ -3,7 +3,7 @@
 __dir__="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "--== Seeding the database ==--"
-flask init-db
+flask db upgrade
 flask create-user admin
 flask create-user david
 
