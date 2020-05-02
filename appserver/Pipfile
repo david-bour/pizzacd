@@ -14,6 +14,7 @@ pycodestyle = "*"
 marshmallow-sqlalchemy = "*"
 psycopg2-binary = "*"
 gunicorn = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.8"
