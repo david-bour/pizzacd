@@ -2,10 +2,16 @@
 
 __dir__="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "--== Seeding the database ==--"
-flask db upgrade
-flask create-user admin
-flask create-user david
-
-echo "--== Running development server ==--"
-flask run --host 0.0.0.0
+if [[ $FLASK_APP_CONFIG=Production ]]
+then
+    echo "--== Setting up Production Environment ==--"
+    gunicorn -b 0.0.0.0:5000 -w4 pizza:app
+else
+    echo "--== Setting up Development Environment ==--"
+    echo "--== Seeding the database ==--"
+    flask db upgrade
+    flask create-user admin
+    flask create-user david
+    echo "--== Running development server ==--"
+    flask run --host 0.0.0.0
+fi
