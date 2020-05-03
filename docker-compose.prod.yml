@@ -13,6 +13,7 @@ services:
 
     appserver:
         container_name: appserver
+        command: ['bin/wait-for-postgres.sh', 'bin/startup.sh']
         build:
             context: ./appserver
             dockerfile: Dockerfile.prod
@@ -20,6 +21,11 @@ services:
             - 5000:5000
         env_file:
             - ./prod.env
+
+    nginx:
+        build: ./proxy
+        ports:
+            - 80:80
 
 volumes:
     postgres_data:

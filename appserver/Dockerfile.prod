@@ -22,4 +22,3 @@ ENV PYTHONPATH $N4J_HOME
 
 USER $APP_USER
 
-ENTRYPOINT [ "bin/startup.sh" ]
