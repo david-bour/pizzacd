@@ -11,4 +11,5 @@ jobs:
             - name: Application Tests
               run: |
                 docker-compose up --build -d
+                ./appserver/bin/wait-for-postgres.sh
                 docker-compose exec -T appserver pytest
