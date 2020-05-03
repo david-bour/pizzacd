@@ -1,0 +1,14 @@
+name: Application Test Suite
+
+on: push
+
+jobs:
+    appserver-test:
+        name: Application Test Suite
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Application Tests
+              run: |
+                docker-compose up --build -d
+                docker-compose exec -T appserver pytest
