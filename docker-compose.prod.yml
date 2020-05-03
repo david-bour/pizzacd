@@ -21,6 +21,8 @@ services:
             - 5000:5000
         env_file:
             - ./prod.env
+        depends_on:
+            - database
 
     nginx:
         build: ./proxy
