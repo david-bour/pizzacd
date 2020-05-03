@@ -1,6 +1,15 @@
 version: '3.5'
 
 services:
+    database:
+        container_name: database
+        image: postgres:11
+        env_file:
+            - ./prod.env
+        ports:
+            - 5432:5432
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
 
     appserver:
         container_name: appserver
@@ -9,12 +18,8 @@ services:
             dockerfile: Dockerfile.prod
         ports:
             - 5000:5000
-        environment:
-            - FLASK_APP=pizza
-            - FLASK_APP_CONFIG=Production
-            - FLASK_DEBUG=1
-            - POSTGRES_HOST=database
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=postgres
-            - POSTGRES_DB=postgres
-            - POSTGRES_PORT=5432
+        env_file:
+            - ./prod.env
+
+volumes:
+    postgres_data:
