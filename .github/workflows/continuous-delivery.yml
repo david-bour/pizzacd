@@ -1,0 +1,23 @@
+name: Continuous Delivery
+
+on: push
+
+env:
+    POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+    POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+    POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+    POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+    POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+
+jobs:
+    build:
+        name: Continuous Delivery
+        runs-on: ubuntu-latest
+        steps:
+            - name: Install doctl
+              uses: digitalocean/action-doctl@v2
+              with:
+                token: ${{ secrets.DO_API_TOKEN }}
+            - name: Add file to DO
+              run: |
+                doctl compute ssh deployer@pizzacd --ssh-command 'touch candy.txt'
