@@ -14,12 +14,12 @@ jobs:
         name: Continuous Delivery
         runs-on: ubuntu-latest
         steps:
-            - name: SSH
+            - name: Try SSH
               uses: appleboy/ssh-action@master
               with:
                 host: 165.227.26.118
                 username: deployer
-                key: ${{ secret.DO_SSH_KEY }}
+                key: ${{ secrets.DO_SSH_KEY }}
                 port: 22
                 script: whoami
 
