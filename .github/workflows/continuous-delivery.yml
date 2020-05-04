@@ -14,10 +14,12 @@ jobs:
         name: Continuous Delivery
         runs-on: ubuntu-latest
         steps:
-            - name: Install doctl
-              uses: digitalocean/action-doctl@v2
+            - name: SSH
+              uses: appleboy/ssh-action@master
               with:
-                token: ${{ secrets.DO_API_TOKEN }}
-            - name: Add file to DO
-              run: |
-                doctl compute ssh deployer@pizzacd --ssh-command 'touch candy.txt'
+                host: 165.227.26.118
+                username: deployer
+                key: ${{ secret.DO_SSH_KEY }}
+                port: 22
+                script: whoami
+
