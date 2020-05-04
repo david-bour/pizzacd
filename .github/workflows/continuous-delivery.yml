@@ -19,6 +19,7 @@ jobs:
               with:
                 host: 165.227.26.118
                 username: deployer
+                password: ${{ secrets.DO_SSH_KEY_PASSWORD }}
                 key: ${{ secrets.DO_SSH_KEY }}
                 port: 22
                 script: whoami
