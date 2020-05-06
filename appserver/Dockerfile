@@ -12,10 +12,10 @@ RUN groupadd -g 1000 $APP_USER && \
 
 WORKDIR $APP_HOME
 
-COPY --chown=1000:1000 Pipfile .
-COPY --chown=1000:1000 Pipfile.lock .
+COPY --chown=1000:1000 Pipfile $APP_HOME
+COPY --chown=1000:1000 Pipfile.lock $APP_HOME
 RUN pipenv install --dev --deploy --system
-COPY --chown=1000:1000 . .
+COPY --chown=1000:1000 . $APP_HOME
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH $N4J_HOME
