@@ -26,6 +26,8 @@ services:
         image: davidbour/nginx:latest
         ports:
             - 80:80
+        depends_on:
+            - appserver
 
 volumes:
     postgres_data:
