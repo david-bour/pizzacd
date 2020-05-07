@@ -12,8 +12,8 @@ RUN groupadd -g 1000 $APP_USER && \
 
 WORKDIR $APP_HOME
 
-COPY --chown=1000:1000 Pipfile $APP_HOME/
-COPY --chown=1000:1000 Pipfile.lock $APP_HOME/
+COPY --chown=1000:1000 Pipfile $APP_HOME/Pipfile
+COPY --chown=1000:1000 Pipfile.lock $APP_HOME/Pipfile.lock
 RUN pipenv install --dev --deploy --system
 COPY --chown=1000:1000 . $APP_HOME/
 
