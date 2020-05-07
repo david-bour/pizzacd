@@ -22,3 +22,5 @@ ENV PYTHONUNBUFFERED 1
 
 USER $APP_USER
 
+ENTRYPOINT [ "./bin/startup.sh" ]
+
