@@ -11,11 +11,11 @@ RUN groupadd -g 1000 $APP_USER && \
     useradd -u 1000 -g 1000 -G sudo --create-home --home-dir $APP_HOME --shell /bin/bash $APP_USER
 
 WORKDIR $APP_HOME
-RUN echo ls
-COPY --chown=1000:1000 Pipfile $APP_HOME/Pipfile
-COPY --chown=1000:1000 Pipfile.lock $APP_HOME/Pipefile.lock
+
+COPY --chown=1000:1000 Pipfile .
+COPY --chown=1000:1000 Pipfile.lock .
 RUN pipenv install --deploy --system
-COPY --chown=1000:1000 . $APP_HOME/
+COPY --chown=1000:1000 . .
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH $APP_HOME

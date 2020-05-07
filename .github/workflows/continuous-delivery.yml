@@ -24,6 +24,7 @@ jobs:
                 password: ${{ secrets.DOCKER_PASSWORD }}
                 repository: davidbour/david
                 tags: latest
+                path: ./appserver
                 dockerfile: ./appserver/Dockerfile.prod
 
             - name: Setup
