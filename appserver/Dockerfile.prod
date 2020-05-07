@@ -17,8 +17,8 @@ COPY --chown=1000:1000 Pipfile.lock .
 RUN pipenv install --deploy --system
 COPY --chown=1000:1000 . .
 
+ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH $APP_HOME
 
 USER $APP_USER
 
