@@ -22,5 +22,4 @@ ENV PYTHONUNBUFFERED 1
 
 USER $APP_USER
 
-ENTRYPOINT [ "bin/startup.sh" ]
-
+ENTRYPOINT ["bin/wait-for-postgres.sh", "bin/startup.sh"]
