@@ -45,7 +45,7 @@ jobs:
                 echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> prod.env
                 echo "POSTGRES_DB=$POSTGRES_DB" >> prod.env
                 echo "FLASK_APP=pizza" >> prod.env
-                echo "FLASK_APP_CONFIG=production" >> prod.env
+                echo "FLASK_APP_CONFIG=Production" >> prod.env
                 echo "FLASK_ENV=production" >> prod.env
 
             - name: SCP docker-compose.prod.yml
