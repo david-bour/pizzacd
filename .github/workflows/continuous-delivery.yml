@@ -23,7 +23,7 @@ jobs:
                 username: ${{ secrets.DOCKER_USERNAME }}
                 password: ${{ secrets.DOCKER_PASSWORD }}
                 repository: davidbour/appserver
-                tags: latest
+                tags: ${{ github.sha }}
                 path: ./appserver
                 dockerfile: ./appserver/Dockerfile.prod
 
@@ -33,7 +33,7 @@ jobs:
                 username: ${{ secrets.DOCKER_USERNAME }}
                 password: ${{ secrets.DOCKER_PASSWORD }}
                 repository: davidbour/nginx
-                tags: latest
+                tags: ${{ github.sha }}
                 path: ./proxy
                 dockerfile: ./proxy/Dockerfile
 
