@@ -9,7 +9,7 @@ app = create_app(config=f'config.{app_config}')
 
 @app.route('/', methods=['GET'])
 def home():
-    return jsonify(dict(result='Home runn!!!')), 200
+    return jsonify(dict(result='Ready to rule the world')), 200
 
 @app.cli.command('create-user')
 @click.argument('name')
