@@ -3,13 +3,20 @@ name: Application Test Suite
 on: push
 
 jobs:
-    appserver-test:
-        name: Application Test Suite
+    setup-test:
+        name: Build Application Test Suite
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
-            - name: Application Tests
+            - name: Setup build
               run: |
                 docker-compose up --build -d
                 docker-compose exec -T appserver bin/wait-for-postgres.sh
-                docker-compose exec -T appserver pytest
+    run-test:
+        name: Run Application Test Suite
+        needs: setup-test
+        runs-on: ubuntu-latest
+        steps:
+          - name: Testing
+            run: |
+              docker-compose exec -T appserver pytest
