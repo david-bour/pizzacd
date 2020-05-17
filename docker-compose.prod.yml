@@ -13,7 +13,7 @@ services:
 
     appserver:
         container_name: appserver
-        image: davidbour/appserver:latest
+        image: davidbour/appserver
         ports:
             - 5000:5000
         env_file:
@@ -23,7 +23,7 @@ services:
 
     nginx:
         container_name: nginx
-        image: davidbour/nginx:latest
+        image: davidbour/nginx
         ports:
             - 80:80
         depends_on:
