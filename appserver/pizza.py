@@ -1,5 +1,6 @@
 import click
 import os
+import jsonify
 from app import create_app, db
 from app.models import Account
 
@@ -8,7 +9,7 @@ app = create_app(config=f'config.{app_config}')
 
 @app.route('/', methods=['GET'])
 def home():
-    return 'Home runn!!!', 200
+    return jsonify(dict(result='Home runn!!!')), 200
 
 @app.cli.command('create-user')
 @click.argument('name')
