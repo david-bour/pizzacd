@@ -12,11 +12,7 @@ jobs:
               run: |
                 docker-compose up --build -d
                 docker-compose exec -T appserver bin/wait-for-postgres.sh
-    run-test:
-        name: Run Application Test Suite
-        needs: setup-test
-        runs-on: ubuntu-latest
-        steps:
-          - name: Testing
-            run: |
-              docker-compose exec -T appserver pytest
+
+            - name: Testing
+              run: |
+                docker-compose exec -T appserver pytest

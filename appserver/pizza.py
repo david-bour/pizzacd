@@ -1,6 +1,6 @@
 import click
 import os
-import jsonify
+from flask import jsonify
 from app import create_app, db
 from app.models import Account
 
