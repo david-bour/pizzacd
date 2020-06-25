@@ -1,0 +1,11 @@
+plugin: gcp_compute
+zones:
+    - us-central1-a
+projects: davidbour-223700
+filters: []
+groups:
+    webservers: "'app' in name"
+scopes:
+    - https://www.googleapis.com/auth/compute
+service_account_file: ./service-account.json
+auth_kind: serviceaccount
