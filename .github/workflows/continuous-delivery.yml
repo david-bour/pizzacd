@@ -1,6 +1,9 @@
 name: Continuous Delivery - Digital Ocean
 
-on: push
+on:
+  release:
+    types:
+      - created
 
 env:
     POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
