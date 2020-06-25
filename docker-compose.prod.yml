@@ -6,16 +6,16 @@ services:
         image: postgres:11
         env_file:
             - ./prod.env
-        ports:
-            - 5432:5432
+        expose:
+            - "5432"
         volumes:
             - postgres_data:/var/lib/postgresql/data/
 
     appserver:
         container_name: appserver
         image: davidbour/appserver
-        ports:
-            - 5000:5000
+        expose:
+            - "5000"
         env_file:
             - ./prod.env
         depends_on:
@@ -25,7 +25,7 @@ services:
         container_name: nginx
         image: davidbour/nginx
         ports:
-            - 80:80
+            - "80:80"
         depends_on:
             - appserver
 
