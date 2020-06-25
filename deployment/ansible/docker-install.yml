@@ -1,0 +1,95 @@
+- name: Install Docker & Docker Compose
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: update apt packages
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+
+    - name: Install dependencies
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+          - python3-pip
+          - python3-setuptools
+        force_apt_get: yes
+
+    - name: Add Docker GPG Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Save the Ubuntu release version into a variable
+      shell: lsb_release -cs
+      register: ubuntu_version
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ubuntu_version.stdout }} stable"
+        state: present
+
+    - name: update apt packages
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+
+    - name: Install Docker
+      apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        force_apt_get: yes
+
+    - name: apt clean and remove unused packages
+      apt:
+        autoclean: yes
+        autoremove: yes
+
+    - name: Test Docker with Hello World example
+      shell: "docker run hello-world"
+      register: hello_world_output
+
+    - name: Show output of hello world
+      debug: "Container output: {{ hello_world_output.stdout }}"
+
+    - name: Create docker group
+      group:
+        name: "docker"
+        state: present
+
+    - name: Add user 'ubuntu' to Docker group
+      user:
+        name: ubuntu
+        groups: ubuntu, docker
+
+    - name: Save the OS
+      shell: uname -s
+      register: os_name
+
+    - name: Save the OS distribution
+      shell: uname -m
+      register: os_dist
+
+    - name: Download docker-compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-{{ os_name.stdout }}-{{ os_dist.stdout }}"
+        dest: /usr/local/bin/docker-compose
+
+    - name: Apply executable binary
+      file:
+        path: /usr/local/bin/docker-compose
+        state: touch
+        mode: a+x
+
+    - name: Install Docker Module for Python
+      pip:
+        name:
+          - docker
+          - docker-compose
