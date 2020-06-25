@@ -3,13 +3,14 @@ import os
 from flask import jsonify
 from app import create_app, db
 from app.models import Account
+from uuid import getnode as get_mac
 
 app_config = os.environ['FLASK_APP_CONFIG']
 app = create_app(config=f'config.{app_config}')
 
 @app.route('/', methods=['GET'])
 def home():
-    return jsonify(dict(result='Ready to rule the world')), 200
+    return jsonify(dict(result=f'Ready to rule the world at {get_mac}')), 200
 
 @app.cli.command('create-user')
 @click.argument('name')

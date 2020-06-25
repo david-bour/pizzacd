@@ -3,6 +3,12 @@
   become: yes
 
   tasks:
+
+    - name: create app user
+      user:
+        name: app
+        shell: /bin/bash
+
     - name: update apt packages
       apt:
         update_cache: yes
@@ -64,10 +70,10 @@
         name: "docker"
         state: present
 
-    - name: Add user 'ubuntu' to Docker group
+    - name: Add user 'app to Docker group
       user:
-        name: ubuntu
-        groups: ubuntu, docker
+        name: app
+        groups: app, docker
 
     - name: Save the OS
       shell: uname -s

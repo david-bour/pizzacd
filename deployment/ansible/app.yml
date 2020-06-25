@@ -2,27 +2,25 @@
   hosts: webservers
   become: yes
   vars:
-    - home_dir: /home/ubuntu
-  vars_files:
-    - secrets.yml
+    - home_dir: /home/app
 
   tasks:
 
     - name: Clone repository
-      become_user: ubuntu
+      become_user: app
       git:
         repo: https://{{ github_token }}@github.com/dbourdeveloper/pizzacd
         dest: "{{ home_dir }}/app"
         depth: 1
 
     - name: Copy env file
-      become_user: ubuntu
+      become_user: app
       copy:
         src: "{{ playbook_dir }}/prod.env"
         dest: "{{ home_dir }}/app/prod.env"
 
     - name: Create and start app
-      become_user: ubuntu
+      become_user: app
       docker_compose:
         project_src: "{{ home_dir }}/app"
         files:
