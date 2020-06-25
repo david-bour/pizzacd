@@ -3,6 +3,8 @@
   become: yes
   vars:
     - home_dir: /home/app
+  vars_files:
+    - secrets.yml
 
   tasks:
 

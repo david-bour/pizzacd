@@ -13,7 +13,9 @@ services:
 
     appserver:
         container_name: appserver
-        image: davidbour/appserver
+        build:
+            context: ./appserver
+            dockerfile: Dockerfile.prod
         expose:
             - "5000"
         env_file:
@@ -23,7 +25,9 @@ services:
 
     nginx:
         container_name: nginx
-        image: davidbour/nginx
+        build:
+            context: ./proxy
+            dockerfile: Dockerfile
         ports:
             - "80:80"
         depends_on:
