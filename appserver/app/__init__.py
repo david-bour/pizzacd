@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -10,6 +11,7 @@ BLUEPRINT_OBJNAME = 'bp'
 db = SQLAlchemy()
 migrate = Migrate()
 ma = Marshmallow()
+cors = CORS()
 
 def create_app(name='application', config='config.Development'):
     app = Flask(name)
@@ -18,6 +20,7 @@ def create_app(name='application', config='config.Development'):
     db.init_app(app)
     migrate.init_app(app, db)
     ma.init_app(app)
+    cors.init_app(app, resources={"*": {"origins": "*"}})
 
     register_blueprints(app, BLUEPRINT_PACKAGE)
     return app

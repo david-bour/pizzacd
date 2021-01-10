@@ -6,5 +6,5 @@ bp = Blueprint('accounts', __name__, url_prefix='/accounts')
 @bp.route('/', methods=['GET'])
 def accounts():
     accounts = Account.query.all()
-    data = accounts_schema.dump(accounts)
-    return jsonify(data), 200
+    data = [account.username for account in accounts]
+    return jsonify(dict(result=data))

@@ -1,0 +1,5 @@
+<h1>Accounts</h1>
+<ul *ngFor="let name of names$ | async">
+  <li>name: {{ name }}</li>
+</ul>
+<router-outlet></router-outlet>
