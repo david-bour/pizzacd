@@ -11,6 +11,21 @@ services:
         networks:
             - backend
 
+    client:
+        container_name: client
+        build:
+            context: ./client
+            dockerfile: Dockerfile
+            target: build
+        command: yarn dev-start
+        volumes:
+            - ./client:/home/node/client
+            - /home/node/client/node_modules
+        ports:
+            - 4200:4200
+        networks:
+            - frontend
+
     appserver:
         container_name: appserver
         command: ['bin/wait-for-postgres.sh', 'bin/startup.sh']
@@ -31,7 +46,23 @@ services:
         volumes:
             - ./appserver:/home/pizza
         networks:
+            - frontend
             - backend
+
+    nginx:
+        container_name: nginx
+        build:
+            context: ./client
+            dockerfile: Dockerfile
+            target: webserver
+        ports:
+            - 80:80
+        depends_on:
+            - appserver
+        networks:
+            - frontend
+
 
 networks:
     backend:
+    frontend:

@@ -8,7 +8,7 @@ export class AppService {
     constructor(private http: HttpClient) { }
 
     accounts(): Observable<String[]> {
-        return this.http.get<{result: String[]}>('http://localhost:5000/accounts').pipe(
+        return this.http.get<{result: String[]}>('/api/accounts/').pipe(
             map(resp => resp.result)
         )
     }
