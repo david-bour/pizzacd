@@ -12,4 +12,16 @@ export class AppService {
             map(resp => resp.result)
         )
     }
+
+    getCache(topic: string) {
+        return this.http.get<{result: string}>(`/api/cache/${topic}`).pipe(
+            map(resp => resp.result)
+        )
+    }
+
+    createCache(topic: string) {
+        return this.http.post<{result: string}>(`/api/cache/${topic}`, {}).pipe(
+            map(resp => resp.result)
+        )
+    }
 }

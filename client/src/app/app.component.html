@@ -2,4 +2,21 @@
 <ul *ngFor="let name of names$ | async">
   <li>name: {{ name }}</li>
 </ul>
+
+<form [formGroup]="form" (ngSubmit)="saveCache()">
+  <label>Add Topic: </label>
+  <input type="text" formControlName="topic">
+  <button type="submit">Submit</button>
+</form>
+
+<form [formGroup]="cacheForm" (ngSubmit)="getCache()">
+  <label>Get Topic: </label>
+  <input type="text" formControlName="topic">
+  <button type="submit">Submit</button>
+</form>
+
+<h2>Topic</h2>
+<!-- <span [(ngModel)]="topic">{{ topic }}</span> -->
+<span>{{ topic }}</span>
+
 <router-outlet></router-outlet>

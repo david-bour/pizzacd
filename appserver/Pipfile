@@ -16,6 +16,10 @@ psycopg2-binary = "*"
 gunicorn = "*"
 pytest = "*"
 flask-cors = "*"
+debugpy = "*"
+redis = "*"
+ipython = "*"
+certifi = "*"
 
 [requires]
 python_version = "3.8"

@@ -34,6 +34,7 @@ services:
         build: ./appserver
         ports:
             - 5000:5000
+            - 10001:10001
         environment:
             - FLASK_APP=pizza
             - FLASK_APP_CONFIG=Development
@@ -43,10 +44,23 @@ services:
             - POSTGRES_PASSWORD=postgres
             - POSTGRES_DB=postgres
             - POSTGRES_PORT=5432
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - REDIS_PASSWORD=password
+            - REDIS_SSL=False
         volumes:
             - ./appserver:/home/pizza
         networks:
             - frontend
+            - backend
+
+    redis:
+        container_name: redis
+        image: redis:alpine
+        command: redis-server --requirepass password
+        ports:
+            - 6379:6379
+        networks:
             - backend
 
     nginx:
