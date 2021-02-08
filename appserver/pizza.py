@@ -7,7 +7,7 @@ from debugger import initialize_flask_server_debugger_if_needed
 from uuid import getnode as get_mac
 
 initialize_flask_server_debugger_if_needed()
-print("Running application...", flush=True)
+
 app_config = os.environ['FLASK_APP_CONFIG']
 app = create_app(config=f'config.{app_config}')
 
