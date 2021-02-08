@@ -23,7 +23,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           image_name: appserver
-          image_tag: ${{ github.sha }}
+          image_tag: ${{ github.sha }},latest
           context: ./appserver
           dockerfile: ./Dockerfile
         
@@ -34,6 +34,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           image_name: webserver
-          image_tag: ${{ github.sha }}
+          image_tag: ${{ github.sha }},latest
           context: ./client
           dockerfile: ./Dockerfile
