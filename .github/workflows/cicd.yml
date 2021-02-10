@@ -37,3 +37,13 @@ jobs:
           image_tag: ${{ github.sha }},latest
           context: ./client
           dockerfile: ./Dockerfile
+
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_SERVICE_ACCOUNT }}
+
+      - name: Deploy Pizza Appserver to Azure
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: pizza-appserver
+          images: pizza.azurecr.io/appserver:${{ github.sha }}
