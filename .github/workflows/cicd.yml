@@ -47,3 +47,22 @@ jobs:
         with:
           app-name: pizza-appserver
           images: pizza.azurecr.io/appserver:${{ github.sha }}
+
+      - name: Deploy Pizza Webserver and Client
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: pizza-webserver
+          images: pizza.azurecr.io/webserver:${{ github.sha }}
+
+      - name: Set Webserver Environment
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: pizza-webserver
+          app-settings-json: |
+          [
+            {
+              "name": "WEBSITES_PORT",
+              "value": 443,
+              "slotSetting": false
+            }
+          ]
