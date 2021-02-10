@@ -48,7 +48,7 @@ jobs:
           app-name: pizza-appserver
           images: pizza.azurecr.io/appserver:${{ github.sha }}
 
-      - name: Deploy Pizza Webserver and Client
+      - name: Deploy Pizza Webserver
         uses: azure/webapps-deploy@v2
         with:
           app-name: pizza-webserver
