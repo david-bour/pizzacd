@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appserver
+  template:
+    metadata:
+      labels:
+        app: appserver
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name: appserver
+          image: pizza.azurecr.io/appserver:latest
+          ports:
+            - containerPort: 5000
+              name: appserver
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appserver
+spec:
+  ports:
+    - port: 5000
+  selector:
+    app: appserver
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webserver
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 1
+      minReadySeconds: 5
+      template:
+        metadata:
+          labels:
+            app: webserver
+        spec:
+          nodeSelector:
+            "beta.kubernetes.io/os": linux
+          containers:
+            - name: webserver
+              image: pizza.azurecr.io/webserver:latest
+              ports:
+                - containerPort: 80
+              resources:
+                requests:
+                  cpu: 250m
+                limits:
+                  cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webserver
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+  selector:
+    app: webserver
