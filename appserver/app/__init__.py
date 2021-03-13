@@ -15,13 +15,6 @@ migrate = Migrate()
 ma = Marshmallow()
 cors = CORS()
 
-r = redis.Redis(
-    host=os.environ.get('REDIS_HOST'),
-    password=os.environ.get('REDIS_PASSWORD'),
-    port=os.environ.get('REDIS_PORT'),
-    ssl=os.environ.get('REDIS_SSL') in ['True', 'true'],
-)
-
 def create_app(name='application', config='config.Development'):
     app = Flask(name)
     app.config.from_object(config)
