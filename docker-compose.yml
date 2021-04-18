@@ -37,11 +37,11 @@ services:
         build: ./appserver
         ports:
             - 5000:5000
-            - 10001:10001
         environment:
             - FLASK_APP=pizza
-            - FLASK_APP_CONFIG=Production
-            - FLASK_ENV=production
+            - FLASK_APP_CONFIG=Development
+            - FLASK_DEBUG=1
+            - FLASK_ENV=development
             - POSTGRES_HOST=database
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=postgres

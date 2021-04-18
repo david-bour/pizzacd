@@ -7,4 +7,5 @@ bp = Blueprint('accounts', __name__, url_prefix='/accounts')
 def accounts():
     accounts = Account.query.all()
     data = [account.username for account in accounts]
+    data = [f'hello {name}! :)' for name in data]
     return jsonify(dict(result=data))

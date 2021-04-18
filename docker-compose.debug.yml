@@ -1,0 +1,7 @@
+version: "2.4"
+
+services:
+  appserver:
+    command: ['bin/wait-for-postgres.sh', 'bin/debug.sh']
+    ports:
+      - 5678:5678

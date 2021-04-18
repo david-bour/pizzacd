@@ -4,11 +4,11 @@
         "name": "Python: Remote Attach",
         "type": "python",
         "request": "attach",
-        "port": 10001,
-        "host": "localhost",
+        "port": 5678,
+        "host": "0.0.0.0",
         "pathMappings": [
           {
-            "localRoot": "${workspaceFolder}",
+            "localRoot": "${workspaceFolder}/appserver",
             "remoteRoot": "/home/pizza"
           }
         ]
