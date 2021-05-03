@@ -1,87 +1,58 @@
-version: '2.4'
+version: "3.7"
 
 services:
-    database:
-        container_name: database
-        mem_limit: 1gb
-        image: postgres:11
-        environment:
-            - POSTGRES_PASSWORD=postgres
-        ports:
-            - 5432:5432
-        networks:
-            - backend
+  database:
+    container_name: database
+    image: postgres:11
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+    networks:
+      - backend
+    depends_on:
+      - appserver
 
-    client:
-        container_name: client
-        mem_limit: 2gb
-        build:
-            context: ./client
-            dockerfile: Dockerfile
-            target: build
-        command: yarn dev-start
-        volumes:
-            - ./client:/home/node/client
-            - /home/node/client/node_modules
-        ports:
-            - 4200:4200
-        networks:
-            - frontend
+  appserver:
+    container_name: appserver
+    command: ["bin/wait-for-postgres.sh", "bin/startup.sh"]
+    build: ./appserver
+    ports:
+      - 5000:5000
+    environment:
+      - FLASK_APP=pizza
+      - FLASK_APP_CONFIG=Production
+      # - FLASK_DEBUG=1
+      - FLASK_ENV=production
+      - POSTGRES_HOST=database
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=password
+      - REDIS_SSL=False
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=test
+      - NEO4J_HOST=neo4jproxy
+      - NEO4J_PORT=7687
+    volumes:
+      - ./appserver:/home/pizza
+    networks:
+      - frontend
+      - backend
 
-    appserver:
-        container_name: appserver
-        mem_limit: 4gb
-        command: ['bin/wait-for-postgres.sh', 'bin/startup.sh']
-        depends_on:
-            - database
-        build: ./appserver
-        ports:
-            - 5000:5000
-        environment:
-            - FLASK_APP=pizza
-            - FLASK_APP_CONFIG=Development
-            - FLASK_DEBUG=1
-            - FLASK_ENV=development
-            - POSTGRES_HOST=database
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=postgres
-            - POSTGRES_DB=postgres
-            - POSTGRES_PORT=5432
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
-            - REDIS_PASSWORD=password
-            - REDIS_SSL=False
-        volumes:
-            - ./appserver:/home/pizza
-        networks:
-            - frontend
-            - backend
-
-    redis:
-        container_name: redis
-        mem_limit: 2gb
-        image: redis:alpine
-        command: redis-server --requirepass password
-        ports:
-            - 6379:6379
-        networks:
-            - backend
-
-    nginx:
-        container_name: nginx
-        mem_limit: 2gb
-        build:
-            context: ./client
-            dockerfile: Dockerfile
-            target: webserver
-        ports:
-            - 80:80
-        depends_on:
-            - appserver
-        networks:
-            - frontend
-
+  redis:
+    container_name: redis
+    image: redis:alpine
+    command: redis-server --requirepass password
+    ports:
+      - 6379:6379
+    networks:
+      - backend
 
 networks:
-    backend:
-    frontend:
+  backend:
+  frontend:
+  n4j:

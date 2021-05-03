@@ -1,0 +1,1 @@
+from .flaskneo4j import FlaskNeo4j

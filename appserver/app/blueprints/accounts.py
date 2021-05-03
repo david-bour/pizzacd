@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+from app import cache
 from app.models import Account, accounts_schema
 
 bp = Blueprint('accounts', __name__, url_prefix='/accounts')
@@ -8,4 +9,5 @@ def accounts():
     accounts = Account.query.all()
     data = [account.username for account in accounts]
     data = [f'hello {name}! :)' for name in data]
+    cache.set('users', data)
     return jsonify(dict(result=data))

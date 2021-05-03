@@ -1,12 +1,26 @@
 import click
 import os
-from flask import jsonify
+from flask import jsonify, g
 from app import create_app, db
 from app.models import Account
 from uuid import getnode as get_mac
+from guppy import hpy
 
 app_config = os.environ['FLASK_APP_CONFIG']
 app = create_app(config=f'config.{app_config}')
+
+@app.before_request
+def before():
+    hp = hpy()
+    before = hp.heap()
+    g.heapy = (hp, before)
+
+@app.teardown_appcontext
+def teardown(err):
+    if 'heapy' in g:
+        heapy, before = g.heapy
+        after = heapy.heap()
+        print(after - before)
 
 @app.route('/', methods=['GET'])
 def home():

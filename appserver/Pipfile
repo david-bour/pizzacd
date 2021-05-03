@@ -20,6 +20,11 @@ debugpy = "*"
 redis = "*"
 ipython = "*"
 certifi = "*"
+neo4j = "*"
+locust = "*"
+flask-caching = "*"
+memory-profiler = "*"
+guppy3 = "*"
 
 [requires]
 python_version = "3.8"

@@ -1,7 +1,7 @@
 FROM python:3.8
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    postgresql-client && \
+    postgresql-client htop tcpdump net-tools && \
     rm -rf /var/lib/apt/lists/*
 RUN pip install pipenv
 

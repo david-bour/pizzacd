@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  client:
+    container_name: client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      target: build
+    command: yarn dev-start
+    volumes:
+      - ./client:/home/node/client
+      - /home/node/client/node_modules
+    ports:
+      - 4200:4200
+    networks:
+      - frontend
+
+  # nginx:
+  #   container_name: nginx
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #     target: webserver
+  #   ports:
+  #     - 80:80
+  #   depends_on:
+  #     - appserver
+  #   networks:
+  #     - frontend
+

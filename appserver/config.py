@@ -21,6 +21,10 @@ class Base():
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    NEO4J_USER = os.environ.get('NEO4J_USER')
+    NEO4J_PASSWORD = os.environ.get('NEO4J_PASSWORD')
+    NEO4J_HOST = os.environ.get('NEO4J_HOST')
+
     SUPPORTED_LOCALES = ['en']
 
 class Development(Base):
