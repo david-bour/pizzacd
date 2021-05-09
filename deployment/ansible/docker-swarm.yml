@@ -1,0 +1,34 @@
+- name: Docker Swarm Dependencies
+  hosts: docker_swarm_nodes
+  become: yes
+
+  tasks:
+    - name: Open Docker Swarm Port
+      ufw:
+        state: enabled
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - 22
+        - 2377
+
+- name: Docker Swarm Manager
+  hosts: docker_swarm_manager
+  become: yes
+
+  tasks:
+    - name: Docker Manager Init
+      docker_swarm:
+        state: present
+        advertise_addr: "{{ ansible_host }}"
+      register: docker_swarm_tokens
+
+- name: Docker Swarm Workers
+  hosts: docker_swarm_workers
+  become: yes
+
+  tasks:
+    - name: Docker Worker Add
+      shell:
+        cmd: "docker swarm join --token {{ hostvars['manager01']['docker_swarm_tokens']['swarm_facts']['JoinTokens']['Worker'] }} {{ hostvars['manager01']['ansible_default_ipv4']['address'] }}:2377"

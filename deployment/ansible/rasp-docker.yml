@@ -1,0 +1,88 @@
+- name: Install Docker & Docker Compose
+  hosts: docker_swarm_nodes
+  become: yes
+
+  tasks:
+
+    - name: Remove old docker versions
+      apt:
+        pkg:
+          - docker
+          - docker-engine
+          - docker.io
+          - containerd
+          - runc
+        state: absent
+
+    - name: Install dependencies
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - software-properties-common
+          - python3-pip
+          - python3-setuptools
+        state: present
+        update_cache: yes
+
+    - name: Add Docker GPG Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Save the Ubuntu release version into a variable
+      shell: lsb_release -cs
+      register: ubuntu_version
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ubuntu_version.stdout }} stable"
+        state: present
+
+    - name: Install Docker
+      apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        update_cache: yes
+
+    - name: apt clean and remove unused packages
+      apt:
+        autoclean: yes
+        autoremove: yes
+
+    - name: Test Docker with Hello World example
+      shell: "docker run hello-world"
+      register: hello_world_output
+
+    - name: Show output of hello world
+      debug: "Container output: {{ hello_world_output.stdout }}"
+
+    - name: Create docker group
+      group:
+        name: docker
+        state: present
+
+    - name: Add user 'app to Docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Save the OS
+      shell: uname -s
+      register: os_name
+
+    - name: Save the OS distribution
+      shell: uname -m
+      register: os_dist
+
+    - name: Install Docker Module for Python
+      pip:
+        name:
+          - docker
+          - docker-compose
