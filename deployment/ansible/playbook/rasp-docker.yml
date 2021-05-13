@@ -25,6 +25,8 @@
           - software-properties-common
           - python3-pip
           - python3-setuptools
+          - python3-venv
+          - net-tools
         state: present
         update_cache: yes
 

@@ -1,0 +1,30 @@
+- name: Docker Swarm Deploy
+  hosts: docker_swarm_manager
+
+  tasks:
+
+    - name: Get Swarm Node ID
+      shell:
+        cmd: docker info -f '{{ '{{' }} .Swarm.NodeID {{ '}}' }}'
+      register: docker_node
+
+    - name: Anchor Label
+      shell:
+        cmd: "docker node update --label-add traefik-public.traefik-public-certificates=true {{ docker_node.stdout }}"
+
+    - name: Create Traefik Public Network
+      docker_network:
+        name: traefik-public
+        driver: overlay
+        internal: no
+
+    - name: Copy Docker Stack File
+      copy:
+        src: ./files/docker-stack.yml
+        dest: "{{ deploy_dir }}"
+        owner: "{{ deploy_user }}"
+    
+    - name: Run Stack File
+      shell:
+        cmd: "docker stack deploy -c docker-stack.yml {{ stack_name }}"
+        chdir: "{{ deploy_dir }}"

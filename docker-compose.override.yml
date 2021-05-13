@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+    proxy:
+        ports:
+            - 80:80
+            - 8090:8080
+        command:
+            - --providers.docker
+            - --providers.docker.constraints=Label(`traefik.constraint-label-stack`, `${TRAEFIK_TAG?Variable not set}`)
+            - --providers.docker.exposedbydefault=false
+            - --accesslog
+            - --log
+            - --api
+            - --api.insecure=true
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.${STACK_NAME?Variable not set}-traefik-public-http.rule=Host(`${DOMAIN?Variable not set}`)
+            - traefik.http.services.${STACK_NAME?Variable not set}-traefik-public.loadbalancer.server.port=80
+
+    appserver:
+        command: ['bin/wait-for-postgres.sh', 'bin/startup.sh']
+        labels:
+            - traefik.enable=true
+            - traefik.http.middlewares.api-stripprefix.stripprefix.prefixes=/api
+            - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+            - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.middlewares=api-stripprefix
+            - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`)
+            - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=5000
+        ports:
+            - 5000:5000
+        environment:
+            - FLASK_APP=pizza
+            - FLASK_APP_CONFIG=Development
+            - FLASK_DEBUG=1
+            - FLASK_ENV=development
+            - POSTGRES_HOST=database
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_DB=postgres
+            - POSTGRES_PORT=5432
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - REDIS_PASSWORD=password
+            - REDIS_SSL=False
+        volumes:
+            - ./appserver:/home/pizza
+
+    webserver:
+        labels:
+            - traefik.enable=true
+            - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+            - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
+            - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=80 
+
+    redis:
+        container_name: redis
+        image: redis:alpine
+        command: redis-server --requirepass password
+    
+    client:
+        container_name: client
+        build:
+            context: ./client
+            dockerfile: Dockerfile
+            target: build
+        command: yarn dev-start
+        volumes:
+            - ./client:/home/node/client
+            - /home/node/client/node_modules
+        ports:
+            - 4200:4200
+
+    database:
+        environment:
+            - POSTGRES_PASSWORD=postgres
+        ports:
+            - 5432:5432
+
+
+networks:
+    traefik-public:
+        # For local dev, don't expect an external Traefik network
+        external: false

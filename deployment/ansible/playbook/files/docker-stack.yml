@@ -1,0 +1,86 @@
+networks:
+  traefik-public:
+    external: true
+    name: traefik-public
+services:
+  appserver:
+    build:
+      context: /Users/dbour/Programming/Projects/pizzacd/appserver
+      dockerfile: Dockerfile
+    container_name: appserver
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.constraint-label-stack=pizza-stack
+        - traefik.http.routers.pizzaparlor-backend-http.rule=PathPrefix(`/api`)
+        - traefik.http.services.pizzaparlor-backend.loadbalancer.server.port=5000
+    image: davidbour/pizza-appserver:latest
+  database:
+    container_name: database
+    deploy:
+      placement:
+        constraints:
+          - node.labels.pizzaparlor.app-db-data == true
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD: postgres
+    image: postgres:11
+    volumes:
+      - app-db-data:/var/lib/postgresql/data/pgdata:rw
+  proxy:
+    command:
+      - --providers.docker
+      - --providers.docker.constraints=Label(`traefik.constraint-label-stack`, `pizza-stack`)
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.swarmmode
+      - --accesslog
+      - --log
+      - --api
+    container_name: proxy
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=pizza-public
+        - traefik.http.middlewares.pizzaparlor-https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.pizzaparlor-https-redirect.redirectscheme.permanent=true
+        - traefik.http.routers.pizzaparlor-proxy-http.rule=Host(`toproduction.io`)
+        - traefik.http.routers.pizzaparlor-proxy-http.entrypoints=http
+        - traefik.http.routers.pizzaparlor-proxy-https.rule=Host(`toproduction.io`)
+        - traefik.http.routers.pizzaparlor-proxy-https.entrypoints=https
+        - traefik.http.routers.pizzaparlor-proxy-https.tls=true
+        - traefik.http.routers.pizzaparlor-proxy-https.tls.certresolver=le
+        - traefik.http.services.pizzaparlor-proxy.loadbalancer.server.port=80
+        - traefik.http.middlewares.pizzaparlor-www-redirect.redirectregex.regex=^https?://(www.)?(toproduction.io)/(.*)
+        - traefik.http.middlewares.pizzaparlor-www-redirect.redirectregex.replacement=https://toproduction.io/$${3}
+        - traefik.http.routers.pizzaparlor-proxy-https.middlewares=pizzaparlor-www-redirect
+        - traefik.http.routers.pizzaparlor-proxy-http.middlewares=pizzaparlor-www-redirect,pizzaparlor-https-redirect
+      placement:
+        constraints:
+          - node.role == manager
+    image: traefik:v2.2
+    networks:
+      default: null
+      traefik-public: null
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+  redis:
+    command: redis-server --requirepass prodpassword
+    container_name: redis
+    image: redis:alpine
+  webserver:
+    build:
+      context: /Users/dbour/Programming/Projects/pizzacd/client
+      dockerfile: Dockerfile
+      target: webserver
+    container_name: webserver
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.constraint-label-stack=pizza-stack
+        - traefik.http.routers.pizzaparlor-frontend-http.rule=PathPrefix(`/`)
+        - traefik.http.services.pizzaparlor-frontend.loadbalancer.server.port=80
+    image: davidbour/pizza-webserver:latest
+version: "3.8"
+volumes:
+  app-db-data: {}

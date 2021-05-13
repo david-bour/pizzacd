@@ -1,0 +1,2 @@
+deploy_user: "ubuntu"
+deploy_dir: "/home/ubuntu"

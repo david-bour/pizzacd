@@ -4,7 +4,7 @@ __dir__="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ "$FLASK_APP_CONFIG" = "Production" ]]; then
     echo "--== Setting up Production Environment ==--"
-    gunicorn -b 0.0.0.0:5000 -w2 --threads 2 pizza:app
+    gunicorn -b 0.0.0.0:5000 -w 2 --threads 2 pizza:app
 else
     echo "--== Setting up Development Environment ==--"
     echo "--== Seeding the database ==--"

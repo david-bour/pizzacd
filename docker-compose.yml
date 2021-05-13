@@ -1,87 +1,94 @@
-version: '2.4'
+version: '3.8'
 
 services:
-    database:
-        container_name: database
-        mem_limit: 1gb
-        image: postgres:11
-        environment:
-            - POSTGRES_PASSWORD=postgres
-        ports:
-            - 5432:5432
-        networks:
-            - backend
 
-    client:
-        container_name: client
-        mem_limit: 2gb
+    proxy:
+        container_name: proxy
+        image: traefik:v2.2
+        networks:
+            - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
+            - default
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        command:
+            - --providers.docker
+            - --providers.docker.constraints=Label(`traefik.constraint-label-stack`, `${TRAEFIK_TAG?Variable not set}`)
+            - --providers.docker.exposedbydefault=false
+            - --providers.docker.swarmmode
+            - --accesslog
+            - --log
+            - --api
+        deploy:
+            placement:
+                constraints:
+                    - node.role == manager
+            labels:
+                - traefik.enable=true
+                - traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK?Variable not set}
+                - traefik.constraint-label=${TRAEFIK_PUBLIC_TAG?Variable not set}
+                - traefik.http.middlewares.${STACK_NAME?Variable not set}-https-redirect.redirectscheme.scheme=https
+                - traefik.http.middlewares.${STACK_NAME?Variable not set}-https-redirect.redirectscheme.permanent=true
+                - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-http.rule=Host(`${DOMAIN?Variable not set}`)
+                - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-http.entrypoints=http
+                - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.rule=Host(`${DOMAIN?Variable not set}`)
+                - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.entrypoints=https
+                - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.tls=true
+                - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.tls.certresolver=le
+                - traefik.http.services.${STACK_NAME?Variable not set}-proxy.loadbalancer.server.port=80
+                - traefik.http.middlewares.${STACK_NAME?Variable not set}-www-redirect.redirectregex.regex=^https?://(www.)?(${DOMAIN?Variable not set})/(.*)
+                - traefik.http.middlewares.${STACK_NAME?Variable not set}-www-redirect.redirectregex.replacement=https://${DOMAIN?Variable not set}/$${3}
+                - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-https.middlewares=${STACK_NAME?Variable not set}-www-redirect
+                - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-http.middlewares=${STACK_NAME?Variable not set}-www-redirect,${STACK_NAME?Variable not set}-https-redirect
+
+    appserver:
+        image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+        build:
+            context: ./appserver
+            dockerfile: Dockerfile        
+        container_name: appserver
+        deploy:
+            labels:
+                - traefik.enable=true
+                - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+                - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.rule=PathPrefix(`/api`)
+                - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=5000
+
+    webserver:
+        image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
         build:
             context: ./client
             dockerfile: Dockerfile
-            target: build
-        command: yarn dev-start
-        volumes:
-            - ./client:/home/node/client
-            - /home/node/client/node_modules
-        ports:
-            - 4200:4200
-        networks:
-            - frontend
-
-    appserver:
-        container_name: appserver
-        mem_limit: 4gb
-        command: ['bin/wait-for-postgres.sh', 'bin/startup.sh']
-        depends_on:
-            - database
-        build: ./appserver
-        ports:
-            - 5000:5000
-        environment:
-            - FLASK_APP=pizza
-            - FLASK_APP_CONFIG=Development
-            - FLASK_DEBUG=1
-            - FLASK_ENV=development
-            - POSTGRES_HOST=database
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=postgres
-            - POSTGRES_DB=postgres
-            - POSTGRES_PORT=5432
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
-            - REDIS_PASSWORD=password
-            - REDIS_SSL=False
-        volumes:
-            - ./appserver:/home/pizza
-        networks:
-            - frontend
-            - backend
+            target: webserver        
+        container_name: webserver
+        deploy:
+            labels:
+                - traefik.enable=true
+                - traefik.constraint-label-stack=${TRAEFIK_TAG?Variable not set}
+                - traefik.http.routers.${STACK_NAME?Variable not set}-frontend-http.rule=PathPrefix(`/`)
+                - traefik.http.services.${STACK_NAME?Variable not set}-frontend.loadbalancer.server.port=80
 
     redis:
         container_name: redis
-        mem_limit: 2gb
         image: redis:alpine
-        command: redis-server --requirepass password
-        ports:
-            - 6379:6379
-        networks:
-            - backend
+        command: redis-server --requirepass prodpassword
 
-    nginx:
-        container_name: nginx
-        mem_limit: 2gb
-        build:
-            context: ./client
-            dockerfile: Dockerfile
-            target: webserver
-        ports:
-            - 80:80
-        depends_on:
-            - appserver
-        networks:
-            - frontend
+    database:
+        container_name: database
+        image: postgres:11
+        volumes:
+            - app-db-data:/var/lib/postgresql/data/pgdata
+        environment:
+            - POSTGRES_PASSWORD=postgres
+            - PGDATA=/var/lib/postgresql/data/pgdata
+        deploy:
+            placement:
+                constraints:
+                    - node.labels.${STACK_NAME?Variable not set}.app-db-data == true
 
+volumes:
+    app-db-data:
 
 networks:
-    backend:
-    frontend:
+    traefik-public:
+        # Allow setting it to false for testing
+        external: ${TRAEFIK_PUBLIC_NETWORK_IS_EXTERNAL-true}
