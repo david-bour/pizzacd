@@ -1,7 +1,7 @@
 name: Config Manager
 
 on:
-  push:
+  # push:
   pull_request:
     branches:
       - main
