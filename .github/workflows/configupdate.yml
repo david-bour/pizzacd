@@ -1,10 +1,9 @@
 name: Config Manager
 
 on:
-  # push:
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build:
