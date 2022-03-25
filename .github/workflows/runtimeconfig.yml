@@ -4,10 +4,13 @@ on:
   pull_request:
     types:
       - closed
+  pull_request_review:
+    types:
+      - submitted
 
 jobs:
   changedfiles:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true || github.event.review.state == 'approved'
     runs-on: ubuntu-latest
     outputs:
       yml: ${{ steps.changes.outputs.yml }}
