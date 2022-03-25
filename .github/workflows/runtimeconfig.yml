@@ -31,8 +31,19 @@ jobs:
     needs: changedfiles
     if: ${{ needs.changedfiles.outputs.yml }}
     steps:
+      - uses: actions/checkout@v2
+
       - name: All Changed Files
         run: echo ${{ needs.changedfiles.outputs.all }}
 
       - name: YAML Changed files
         run: echo ${{ needs.changedfiles.outputs.yml }}
+
+      - name: Install Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+          cache: "pip"
+
+      - name: Run Python Script
+        run: python3 readin.py ${{ needs.changedfiles.outputs.yml }}
