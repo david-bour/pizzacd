@@ -1,13 +1,13 @@
 name: Runtime Configurator
 
 on:
-  pull_request:
+  pull_request_target:
     types:
-      - "opened"
-      - "reopened"
+      - closed
 
 jobs:
   changedfiles:
+    if: github.event.pull_request_target.merged == true
     runs-on: ubuntu-latest
     outputs:
       yml: ${{ steps.changes.outputs.yml }}
