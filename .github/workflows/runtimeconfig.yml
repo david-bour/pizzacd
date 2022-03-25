@@ -1,0 +1,35 @@
+name: Runtime Configurator
+
+on:
+  pull_request:
+    types:
+      - "opened"
+      - "reopened"
+
+jobs:
+  changedfiles:
+    runs-on: ubuntu-latest
+    outputs:
+      yml: ${{ steps.changes.outputs.yml }}
+      all: ${{ steps.changes.outputs.all }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changes
+        run: |
+          echo "::set-output name=all::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
+          echo "::set-output name=yml::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep -E 'app.*.(yml|yaml)' | xargs)"
+
+  yamlfiles:
+    runs-on: ubuntu-latest
+    needs: changedfiles
+    if: ${{ needs.changedfiles.outputs.yml }}
+    steps:
+      - name: All Changed Files
+        run: echo ${{ needs.changedfiles.outputs.all }}
+
+      - name: YAML Changed files
+        run: echo ${{ needs.changedfiles.outputs.yml }}
